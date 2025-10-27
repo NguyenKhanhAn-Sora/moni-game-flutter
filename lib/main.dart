@@ -28,8 +28,8 @@ class MemoryHomePage extends StatefulWidget {
 }
 
 class CardModel {
-  final int id; // unique id for each card instance
-  final String content; // emoji or image path
+  final int id;
+  final String content;
   bool revealed;
   bool matched;
 
@@ -42,8 +42,8 @@ class CardModel {
 }
 
 class _MemoryHomePageState extends State<MemoryHomePage> {
-  // Default size: 4x4 (8 pairs)
-  int gridSize = 4;
+  int gridRows = 4;
+  int gridColumns = 4;
   late List<CardModel> cards;
   CardModel? firstPick;
   bool waiting = false;
@@ -88,7 +88,7 @@ class _MemoryHomePageState extends State<MemoryHomePage> {
     firstPick = null;
     waiting = false;
 
-    final numPairs = (gridSize * gridSize) ~/ 2;
+    final numPairs = (gridRows * gridColumns) ~/ 2;
     final rnd = Random();
     final emojis = List<String>.from(_allEmojis)..shuffle(rnd);
     final chosen = emojis.take(numPairs).toList();
@@ -99,6 +99,7 @@ class _MemoryHomePageState extends State<MemoryHomePage> {
       temp.add(CardModel(id: idCounter++, content: e));
       temp.add(CardModel(id: idCounter++, content: e));
     }
+
     temp.shuffle(rnd);
     cards = temp;
 
@@ -119,10 +120,8 @@ class _MemoryHomePageState extends State<MemoryHomePage> {
       return;
     }
 
-    // second pick
     moves++;
     if (firstPick!.content == card.content && firstPick!.id != card.id) {
-      // matched
       setState(() {
         firstPick!.matched = true;
         card.matched = true;
@@ -130,12 +129,10 @@ class _MemoryHomePageState extends State<MemoryHomePage> {
         firstPick = null;
       });
 
-      // check win
-      if (matchesFound == (gridSize * gridSize) ~/ 2) {
+      if (matchesFound == (gridRows * gridColumns) ~/ 2) {
         _showWinDialog();
       }
     } else {
-      // not matched -> flip back after short delay
       waiting = true;
       Future.delayed(const Duration(milliseconds: 700), () {
         setState(() {
@@ -242,7 +239,7 @@ class _MemoryHomePageState extends State<MemoryHomePage> {
                 child: GridView.builder(
                   itemCount: cards.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: gridSize,
+                    crossAxisCount: gridColumns,
                     crossAxisSpacing: spacing,
                     mainAxisSpacing: spacing,
                   ),
@@ -256,7 +253,7 @@ class _MemoryHomePageState extends State<MemoryHomePage> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
-                'Grid: ${gridSize}x$gridSize — Pairs: ${(gridSize * gridSize) ~/ 2}',
+                'Grid: ${gridColumns}x$gridRows — Pairs: ${(gridRows * gridColumns) ~/ 2}',
                 style: const TextStyle(fontSize: 14, color: Colors.black54),
               ),
             ),
@@ -270,57 +267,88 @@ class _MemoryHomePageState extends State<MemoryHomePage> {
     showDialog(
       context: context,
       builder: (context) {
-        int tempSize = gridSize;
-        return AlertDialog(
-          title: const Text('Chọn kích thước lưới'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<int>(
-                value: 2,
-                groupValue: tempSize,
-                title: const Text('2 x 2 (1 pair)'),
-                onChanged: (v) => setState(() => tempSize = v ?? 2),
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            String tempMode = '${gridColumns}x$gridRows';
+            return AlertDialog(
+              title: const Text('Chọn kích thước lưới'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RadioListTile<String>(
+                    value: '2x2',
+                    groupValue: tempMode,
+                    title: const Text('2 x 2 (2 pairs)'),
+                    onChanged: (v) {
+                      if (v != null) {
+                        setDialogState(() => tempMode = v);
+                        gridColumns = 2;
+                        gridRows = 2;
+                        _startNewGame();
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                  RadioListTile<String>(
+                    value: '4x4',
+                    groupValue: tempMode,
+                    title: const Text('4 x 4 (8 pairs)'),
+                    onChanged: (v) {
+                      if (v != null) {
+                        setDialogState(() => tempMode = v);
+                        gridColumns = 4;
+                        gridRows = 4;
+                        _startNewGame();
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                  RadioListTile<String>(
+                    value: '6x6',
+                    groupValue: tempMode,
+                    title: const Text('6 x 6 (18 pairs)'),
+                    onChanged: (v) {
+                      if (v != null) {
+                        setDialogState(() => tempMode = v);
+                        gridColumns = 6;
+                        gridRows = 6;
+                        _startNewGame();
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                  RadioListTile<String>(
+                    value: '6x8',
+                    groupValue: tempMode,
+                    title: const Text('6 x 8 (24 pairs)'),
+                    onChanged: (v) {
+                      if (v != null) {
+                        setDialogState(() => tempMode = v);
+                        gridColumns = 6;
+                        gridRows = 8;
+                        _startNewGame();
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                ],
               ),
-              RadioListTile<int>(
-                value: 4,
-                groupValue: tempSize,
-                title: const Text('4 x 4 (8 pairs)'),
-                onChanged: (v) => setState(() => tempSize = v ?? 4),
-              ),
-              RadioListTile<int>(
-                value: 6,
-                groupValue: tempSize,
-                title: const Text('6 x 6 (18 pairs)'),
-                onChanged: (v) => setState(() => tempSize = v ?? 6),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Hủy'),
-            ),
-            TextButton(
-              onPressed: () {
-                // ensure even number of cards
-                gridSize = tempSize;
-                _startNewGame();
-                Navigator.pop(context);
-              },
-              child: const Text('OK'),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Hủy'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
 }
 
-/// A simple flip widget: shows back when [isFront] is false, otherwise front.
-/// Uses rotationY transform for flip effect.
 class CardFlip extends StatelessWidget {
   final bool isFront;
   final Widget front;
@@ -345,7 +373,7 @@ class CardFlip extends StatelessWidget {
           builder: (context, child) {
             final angle = rotate.value;
             final transform = Matrix4.identity()
-              ..setEntry(3, 2, 0.001) // perspective
+              ..setEntry(3, 2, 0.001)
               ..rotateY(angle);
             return Transform(
               transform: transform,
