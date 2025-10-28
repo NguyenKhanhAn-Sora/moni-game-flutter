@@ -221,8 +221,6 @@ class _ScoreScreenState extends State<ScoreScreen> {
             ),
             title: Row(
               children: [
-                const Icon(Icons.touch_app, size: 18, color: Colors.blue),
-                const SizedBox(width: 5),
                 Text(
                   '${score.moves} moves',
                   style: TextStyle(

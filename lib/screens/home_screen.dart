@@ -123,18 +123,18 @@ class HomeScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Thoát ứng dụng'),
-        content: const Text('Bạn có chắc muốn thoát?'),
+        title: const Text('Exit app'),
+        content: const Text('Are you sure you want to exit?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
               SystemNavigator.pop();
             },
-            child: const Text('Thoát', style: TextStyle(color: Colors.red)),
+            child: const Text('Exit', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

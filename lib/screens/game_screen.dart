@@ -130,11 +130,9 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _showWinDialog() async {
-    // Lưu kỷ lục
     final mode = '${gridColumns}x$gridRows';
     await _scoreService.saveScore(mode, moves);
 
-    // Kiểm tra xem có phải kỷ lục mới không
     final bestScore = await _scoreService.getBestScore(mode);
     final isNewRecord = bestScore?.moves == moves;
 
@@ -146,7 +144,7 @@ class _GameScreenState extends State<GameScreen> {
       builder: (_) => AlertDialog(
         title: Row(
           children: [
-            const Text('Bạn chiến thắng! '),
+            const Text('You Win! '),
             const Text('🎉'),
             if (isNewRecord) ...[
               const SizedBox(width: 5),
@@ -158,7 +156,7 @@ class _GameScreenState extends State<GameScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Bạn hoàn thành trong $moves lượt.'),
+            Text('You completed in $moves moves.'),
             const SizedBox(height: 10),
             if (isNewRecord)
               Container(
@@ -174,7 +172,7 @@ class _GameScreenState extends State<GameScreen> {
                     Icon(Icons.star, color: Colors.amber.shade700, size: 20),
                     const SizedBox(width: 5),
                     const Text(
-                      'Kỷ lục mới!',
+                      'New Record!',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.orange,
@@ -184,23 +182,23 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             const SizedBox(height: 10),
-            const Text('Chơi lại?', style: TextStyle(fontSize: 14)),
+            const Text('Play again?', style: TextStyle(fontSize: 14)),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pop(context); // Quay về Home
+              Navigator.pop(context);
             },
-            child: const Text('Về Home'),
+            child: const Text('Home'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _startNewGame();
             },
-            child: const Text('Chơi lại'),
+            child: const Text('Play Again'),
           ),
         ],
       ),
@@ -234,15 +232,15 @@ class _GameScreenState extends State<GameScreen> {
     final double spacing = 8;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Memory Match - Lật thẻ'),
+        title: const Text('Memory Match - Flip Cards'),
         actions: [
           IconButton(
-            tooltip: 'Đổi kích thước lưới',
+            tooltip: 'Change Grid Size',
             icon: const Icon(Icons.grid_on),
             onPressed: () => _showGridSizeDialog(),
           ),
           IconButton(
-            tooltip: 'Chơi lại',
+            tooltip: 'Restart',
             icon: const Icon(Icons.refresh),
             onPressed: _startNewGame,
           ),
@@ -308,7 +306,7 @@ class _GameScreenState extends State<GameScreen> {
           builder: (context, setDialogState) {
             String tempMode = '${gridColumns}x$gridRows';
             return AlertDialog(
-              title: const Text('Chọn kích thước lưới'),
+              title: const Text('Choose Grid Size'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -375,7 +373,7 @@ class _GameScreenState extends State<GameScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text('Hủy'),
+                  child: const Text('Cancel'),
                 ),
               ],
             );
